@@ -1,0 +1,9 @@
+[submodule "output"]
+	path = output
+	url = git@github.com:SpeDAllen/SpeDAllen.github.io.git
+[submodule "pelican-plugins"]
+	path = pelican-plugins
+	url = https://github.com/getpelican/pelican-plugins
+[submodule "pelican-themes"]
+	path = pelican-themes
+	url = git@github.com:getpelican/pelican-themes.git
