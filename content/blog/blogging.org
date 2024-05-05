@@ -90,6 +90,6 @@ pkgs.mkShell
     # '';
   }
 #+end_src
-** Final thoughts
+* Final thoughts
 There's work still to be done with the syntax highlighting some formatting I'd like to improve but that can be tomorrows problem.
 

@@ -1,0 +1,294 @@
+#+title: Create a useful development shell
+#+DATE: 2024-05-05
+#+AUTHOR: SpeDAllen
+#+PROPERTY: LANGUAGE en
+#+PROPERTY: SLUG create-a-useful-dev-shell
+#+PROPERTY: TAGS flakes, blog, pelican, devShell, orgMode, emacs
+#+options: toc:nil num:nil ^:nil
+
+* Creating a useful dev shell for blogging
+In my previous post the shell.nix file was rather sparse. I was using it mostly to setup and use Pelican but dev shells in NixOs are far more useful then just providing build tools. They can provide your entire IDE as well. That's what I set out to do this weekend and I feel I've had some success so here's a post to share my experience.
+** False starts and missteps
+It feels like I can't do a lot of new things these days without first running face first into some brick walls. The first problem I ran into trying to use Emacs in the dev shell was Emacs by default will use the users Emacs init file. For some people this won't be a problem but my system Emacs version is different then the one in the dev shell so the init file was not compatible. I remembered the NixOs wiki went into detail on how to incorporate your lisp into your nix configuration so that's where I started. The NixOs wiki [[https://nixos.wiki/wiki/Emacs][article]] on Emacs is heavily reliant on the community overlay which I had never used. The article describes it's usage in a flake but in a dev shell. Trying to marry the two proved frustrating and ultimately unnecessary. I eventually realized that you can just supply a custom init file and make your dev shell load Emacs using that init file. The next wall I ran into came when trying to automate the addition of the header text that Pelican uses to supply metadata for the blog but more on that later.
+** Dev shell auto start
+I used the dev shells shell hook function to start it's copy of Emacs and load my custom init file with ~emacs -q -l ./.emacs &~ since I named my init file ~.emacs~ and it's in the current directory when I run ~nix develop~. In my previous post I discussed the usefulness of ~make devserver~ and I wanted it to auto start for me when I start blogging so I included a line to do that as well. Since I'm writing a custom init file for this shell I don't want Pelican to be reliant on a users init file so I found a variable you can set in the pelicanconf.py file which tells Pelican which init file to use with Emacs. This is another one time setting so after using it in the nix development environment I commented it out of the shell.nix file. Here's the resulting shell hook.
+#+begin_src nix
+
+  shellHook = ''
+    # echo ORG_READER_EMACS_LOCATION = \'${pkgs.emacs29-pgtk}/bin/emacs\' >> ./pelicanconf.py
+    # echo ORG_READER_EMACS_SETTINGS = \'./.emacs\' >> ./pelicanconf.py
+    emacs -q -l ./.emacs &
+    make devserver
+  '';
+#+end_src
+* Extra Emacs packages for a custom environment
+By default Emacs looks a bit dated it also presents terribly in a Wayland compositor but with a little effort it cleans up nicely. One of the new features in Emacs is the ability to compile it as a pure GTK application. GTK applications work a lot better on Wayland and thankfully we don't need to compile it ourselves as it's available in the Nix store. Just like we did with the Python packages we can have our Nix shell use a string list to install our Emacs packages in our dev shell for us. I use a few of them here and will cover what they do later in the article.
+#+begin_src nix
+
+    ((emacsPackagesFor pkgs.emacs29-pgtk).emacsWithPackages (
+    epkgs: [
+      epkgs.htmlize
+      epkgs.nix-mode
+      epkgs.use-package
+      epkgs.nerd-icons
+      epkgs.evil-nerd-commenter
+      epkgs.doom-modeline
+      epkgs.all-the-icons
+      epkgs.doom-themes
+      epkgs.rainbow-delimiters
+      epkgs.org
+      epkgs.org-bullets
+      epkgs.visual-fill-column
+      epkgs.string-inflection
+    ]
+  ))
+#+end_src
+We'll also need a few fonts and can't forget our spelling dictionary.
+#+begin_src nix
+
+  emacs-all-the-icons-fonts
+  dejavu_fonts
+  hunspell
+  hunspellDicts.en_US-large
+#+end_src
+Pulling it all together for a complete set of packages makes our shell rather full. Though it could always be worse.
+#+begin_src nix
+  
+  packages = with pkgs; [
+    (python3.withPackages (python-pkgs: [
+      python-pkgs.pelican
+      python-pkgs.ghp-import
+    ]))
+    ((emacsPackagesFor pkgs.emacs29-pgtk).emacsWithPackages (
+      epkgs: [
+        epkgs.htmlize
+        epkgs.nix-mode
+        epkgs.use-package
+        epkgs.nerd-icons
+        epkgs.evil-nerd-commenter
+        epkgs.doom-modeline
+        epkgs.all-the-icons
+        epkgs.doom-themes
+        epkgs.rainbow-delimiters
+        epkgs.org
+        epkgs.org-bullets
+        epkgs.visual-fill-column
+        epkgs.string-inflection
+      ]
+    ))
+    emacs-all-the-icons-fonts
+    dejavu_fonts
+    hunspell
+    hunspellDicts.en_US-large
+  ];
+#+end_src
+* A custom Emacs init for a comfortable experience
+Most of the init file I use here was either inspired by or downright stolen from [[https://github.com/daviwil][David Wilson]] following his Emacs from scratch YouTube series on his [[https://www.youtube.com/@SystemCrafters][System Crafters]] channel. He does a much better job of explaining everything then I ever could so I'll just cover the highlights here. If you're interested in learning how to configure and use Emacs I can't recommend his YouTube series enough.
+** Stripping out the old Emacs UI elements
+Here I disable the title bar, button menu, and welcome page. And start setting up some basic fonts while enabling background opacity.
+#+begin_src emacs-lisp
+
+  (setq inhibit-startup-message t)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (tooltip-mode -1)
+  (set-fringe-mode 10)
+  (menu-bar-mode -1)
+  (setq visible-bell t)
+  (setq select-enable-clipboard t)
+  (mouse-avoidance-mode 'exile)
+  (setq frame-title-format "Emacs")
+  (setq warning-minimum-level :emergency)
+  (defun sda/set-font-face ()
+    (set-face-attribute 'default nil :font "DejaVuSansM Nerd Font 10")
+    (add-to-list 'default-frame-alist '(alpha-background . 90)))
+
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions
+                (lambda (frame)
+                  (with-selected-frame frame
+                    (sda/set-font-face)))))
+  (sda/set-font-face)
+#+end_src
+** Getting started with packages
+Next I ensure access to the package archives and setup use-package.
+#+begin_src emacs-lisp
+
+  (require 'package)
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                           ("org" . "https://orgmode.org/elpa/")
+                           ("gnu" . "https://elpa.gnu.org/packages/")
+                           ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
+  (package-initialize)
+  (unless package-archive-contents
+    (package-refresh-contents))
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+  (setq use-package-verbose t)
+#+end_src
+** Emacs look and feel
+In the next section I setup a lot of the look and feel of Emacs in general as well as adding some nice quality of life keybindings.
+#+begin_src emacs-lisp
+
+  (use-package nerd-icons
+    :custom
+    (nerd-icon-font-family "DejaVuSansM Nerd Font"))
+
+  (use-package evil-nerd-commenter
+    :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+
+  (use-package doom-modeline
+    :init (doom-modeline-mode t)
+    :custom ((doom-modeline-height 4)))
+
+  (use-package all-the-icons)
+
+  (use-package doom-themes
+    :init (load-theme 'doom-palenight t))
+
+  (column-number-mode)
+  (global-display-line-numbers-mode t)
+  (dolist (mode '(org-mode-hook
+                  term-mode-hook
+                  eshell-mode-hook
+                  shell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+#+end_src
+** Configuring Org mode
+This section is rather extensive. The majority of what I plan to do with this environment is write blog posts in org mode so getting Org mode into a comfortable state is worth the extra effort.
+#+begin_src emacs-lisp
+
+  (defun sda/org-font-setup ()
+    ;; Replace list hyphen with dot
+    (font-lock-add-keywords 'org-mode
+                            '(("^ *\\([-]\\) "
+                               (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+    ;; Disable org indent
+    (setq org-adapt-indentation nil)
+
+    ;; Set faces for heading levels
+    (dolist (face '((org-level-1 . 1.2)
+                    (org-level-2 . 1.1)
+                    (org-level-3 . 1.05)
+                    (org-level-4 . 1.0)
+                    (org-level-5 . 1.1)
+                    (org-level-6 . 1.1)
+                    (org-level-7 . 1.1)
+                    (org-level-8 . 1.1)))
+      (set-face-attribute (car face) nil :font "DejaVu Sans Mono" :weight 'regular :height (cdr face)))
+
+    ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+    (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
+    (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
+    (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
+    (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
+
+  (defun sda/org-mode-setup ()
+    (org-indent-mode)
+    (turn-on-font-lock)
+    (variable-pitch-mode 1)
+    (visual-line-mode 1)
+    (setq evil-auto-indent nil)
+    (setq org-link-elisp-confirm-function nil)
+    (setq org-export-backends
+          '(ascii html icalendar latex md odt))
+    (setq org-todo-keywords
+          '((sequence "TODO" "In Process" "|" "Done" "Abandoned"))))
+
+  (use-package org
+    :hook (org-mode . sda/org-mode-setup)
+    :config
+    (sda/org-font-setup))
+
+  (use-package org-bullets
+    :hook (org-mode . org-bullets-mode)
+    :custom
+    (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+  (defun sda/org-mode-visual-fill()
+    (setq visual-fill-column-width 150
+          visual-fill-column-center-text t)
+    (visual-fill-column-mode 1))
+
+  (use-package visual-fill-column
+    :hook (org-mode . sda/org-mode-visual-fill))
+
+  (with-eval-after-load 'org
+    (org-babel-do-load-languages
+     'org-bable-load-languages
+     '((emacs-lisp . t)))
+    (setq org-confirm-babel-evaluate nil))
+
+  (with-eval-after-load 'org
+    (require 'org-tempo)
+    (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+    (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+    (add-to-list 'org-structure-template-alist '("ht" . "src html"))
+    (add-to-list 'org-structure-template-alist '("md" . "src markdown"))
+    (add-to-list 'org-structure-template-alist '("nx" . "src nix"))
+    (add-to-list 'org-structure-template-alist '("pw" . "src powershell")))
+#+end_src
+** Spell checking
+Since these blog posts will available publicly having a good spell checker is crucial.
+#+begin_src emacs-lisp
+
+  (setq ispell-program-name "hunspell")
+
+  ;; "en_US" is key to lookup in `ispell-local-dictionary-alist'.
+  ;; Please note it will be passed as default value to hunspell CLI `-d` option
+  ;; if you don't manually setup `-d` in `ispell-local-dictionary-alist`
+  (setq ispell-local-dictionary "en_US")
+
+  (setq ispell-local-dictionary-alist
+        '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+
+  (autoload 'flyspell-mode "flyspell" "On-the-fly spelling checker." t)
+  (add-hook 'message-mode-hook 'turn-on-flyspell)
+  (add-hook 'text-mode-hook 'turn-on-flyspell)
+  (add-hook 'org-mode-hook 'flyspell-prog-mode)
+  (defun turn-on-flyspell ()
+    "Force flyspell-mode on using a positive arg.  For use in hooks."
+    (interactive)
+    (flyspell-mode 1))
+
+  (eval-after-load "flyspell"
+    '(progn
+       (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
+       (define-key flyspell-mouse-map [mouse-3] #'undefined)))
+#+end_src
+** Extra functionality
+Here we enable some packages. I don't need them customized or do any modifications here it's just extra functionally that I need here and I need it working
+#+begin_src emacs-lisp
+
+  (require 'htmlize)
+  (require 'nix-mode)
+  (require 'string-inflection)
+#+end_src
+** Custom functions
+Until this point everything I've included in this new special dev shell init file has been a direct copy paste from my system init file. So why do this? Why not just use you system init file and call it a day? Two reasons: 1 Including it here that means no matter what as long as I have access to this Git repository and it's sub-modules I have my development environment ready go. It'll be exactly the way I left it. If for some reason I don't blog for three months or three years and a new version of Emacs is released my entire system configuration changes I don't have to retrain Emacs how to do what it's doing today. 2 Custom functions for this environment. You see I've been using Emacs for 30 some odd years now. My system configuration is so cluttered with functions I don't remember what half of them do any more. Having the custom functions here for this bespoke purpose means they're not in my system configuration where I may never find them again. Or make four of them because I keep forgetting that I already did it.
+*** Add Pelican header to a blog post
+This is another place I stumbled a bit. Pelican needs a header to perform it's metadata magic and I don't want to manually copy and paste that header each time I start a new post. I initially tried using auto-insert-mode for this but quickly found it was just appending the text and would do it each time I opened the file. It appears that the Emacs package header2 is how most people apply headers in Emacs these days but that package isn't available in the Nix store. I also want my file names to be taken from the blog title and saved in lower camel case. This particular kind of string manipulation is new to me in lisp so it took a bit of trial and error but we got there in the end
+#+begin_src emacs-lisp
+
+  (defun sda/new-post ()
+    (interactive)
+    (setq new-blog-post-title (read-from-minibuffer "Post name: "))
+    (setq new-blog-post-tags (read-from-minibuffer "Tags: "))
+    (setq new-blog-post-slug (downcase (replace-regexp-in-string "[^[:alpha:][:digit:]_-]" "" (string-replace " " "-" new-blog-post-title))))
+    (setq new-blog-post-file (concat "./content/blog/" (string-inflection-lower-camelcase-function (string-replace " " "_" new-blog-post-title)) ".org"))
+    (let ((org-capture-templates
+          `(("p" "New Pelican blog post" plain (file new-blog-post-file)
+             ,(concat "#+title: " new-blog-post-title "\n#+DATE: " (format-time-string "%Y-%m-%d") "\n#+AUTHOR: SpeDAllen\n#+PROPERTY: LANGUAGE en\n#+PROPERTY: SLUG " new-blog-post-slug "\n#+PROPERTY: TAGS " new-blog-post-tags "\n#+options: toc:nil num:nil ^:nil\n")))
+          )) (org-capture)))
+#+end_src
+* Final thoughts
+With the custom function I can get a new blog post started very quickly. My workflow consists of navigating to the Git repository, running ~nix develop~, toggling my terminal scratchpad out of the way, and running ~M-x sda/new-post~ after following the on screen prompts my new Org file is created and I can start adding content. Next week I plan to shift my focus back to Pelican. It's time to clean the site up a bit. Add a welcome page, about me, 404, and so on. Perhaps I'll even do something about this theme.

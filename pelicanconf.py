@@ -41,4 +41,5 @@ DEFAULT_PAGINATION = 10
 
 PLUGIN_PATHS = ['./pelican-plugins']
 PLUGINS = ['org_reader']
-ORG_READER_EMACS_LOCATION = '/nix/store/m9az6f33vf6dkfxqfk5xxg6yg6gr8syc-emacs-28.2/bin/emacs'
+ORG_READER_EMACS_LOCATION = 'emacs'
+ORG_READER_EMACS_SETTINGS = './.emacs'
