@@ -3,8 +3,8 @@
 #+OPTIONS: toc:nil num:nil ^:nil
 #+PROPERTY: SLUG blog/blogging
 #+PROPERTY: TAGS flakes, blog, pelican, devShell, orgMode, gitHub
+#+EXPORT_FILE_NAME: ../../content/blog/pelicanBloggingWithOrgMode
 
-* Setting up this blog
 ** GitHub pages
 GitHub will host your static web pages for you even on a free account making it rather ideal for a blog hosting platform.
 ** Pelican

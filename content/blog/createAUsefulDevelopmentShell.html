@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-05-09 do 22:03 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Create a useful development shell</title>
+<meta name="author" content="SpeDAllen" />
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+ pre.src { background-color: #292D3E;}</style>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Create a useful development shell</h1>
+
+<div id="outline-container-orgc7af6d7" class="outline-2">
+<h2 id="orgc7af6d7">My dev shell for blogging</h2>
+<div class="outline-text-2" id="text-orgc7af6d7">
+<p>
+In my previous post the shell.nix file was rather sparse. I was using it mostly to setup and use Pelican but dev shells in NixOs are far more useful then just providing build tools. They can provide your entire IDE as well. That's what I set out to do this weekend and I feel I've had some success so here's a post to share my experience.
+</p>
+</div>
+<div id="outline-container-orgbff4054" class="outline-3">
+<h3 id="orgbff4054">False starts and missteps</h3>
+<div class="outline-text-3" id="text-orgbff4054">
+<p>
+It feels like I can't do a lot of new things these days without first running face first into some brick walls. The first problem I ran into trying to use Emacs in the dev shell was Emacs by default will use the users Emacs init file. For some people this won't be a problem but my system Emacs version is different then the one in the dev shell so the init file was not compatible. I remembered the NixOs wiki went into detail on how to incorporate your lisp into your nix configuration so that's where I started. The NixOs wiki <a href="https://nixos.wiki/wiki/Emacs">article</a> on Emacs is heavily reliant on the community overlay which I had never used. The article describes it's usage in a flake but in a dev shell. Trying to marry the two proved frustrating and ultimately unnecessary. I eventually realized that you can just supply a custom init file and make your dev shell load Emacs using that init file. The next wall I ran into came when trying to automate the addition of the header text that Pelican uses to supply metadata for the blog but more on that later.
+</p>
+</div>
+</div>
+<div id="outline-container-org2139b3f" class="outline-3">
+<h3 id="org2139b3f">Dev shell auto start</h3>
+<div class="outline-text-3" id="text-org2139b3f">
+<p>
+I used the dev shells shell hook function to start it's copy of Emacs and load my custom init file with <code>emacs -q -l ./.emacs &amp;</code> since I named my init file <code>.emacs</code> and it's in the current directory when I run <code>nix develop</code>. In my previous post I discussed the usefulness of <code>make devserver</code> and I wanted it to auto start for me when I start blogging so I included a line to do that as well. Since I'm writing a custom init file for this shell I don't want Pelican to be reliant on a users init file so I found a variable you can set in the pelicanconf.py file which tells Pelican which init file to use with Emacs. This is another one time setting so after using it in the nix development environment I commented it out of the shell.nix file. Here's the resulting shell hook.
+</p>
+<div class="org-src-container">
+<pre class="src src-nix">
+<span style="color: #ffcb6b;">shellHook</span> = <span style="color: #c3e88d;">''</span>
+<span style="color: #c3e88d;">  # echo ORG_READER_EMACS_LOCATION = \'</span><span style="color: #89DDFF; font-weight: bold;">${</span>pkgs.emacs29-pgtk<span style="color: #89DDFF; font-weight: bold;">}</span><span style="color: #c3e88d;">/bin/emacs\' &gt;&gt; ./pelicanconf.py</span>
+<span style="color: #c3e88d;">  # echo ORG_READER_EMACS_SETTINGS = \'./.emacs\' &gt;&gt; ./pelicanconf.py</span>
+<span style="color: #c3e88d;">  emacs -q -l ./.emacs &amp;</span>
+<span style="color: #c3e88d;">  make devserver</span>
+<span style="color: #c3e88d;">''</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgba2bcef" class="outline-2">
+<h2 id="orgba2bcef">Extra Emacs packages for a custom environment</h2>
+<div class="outline-text-2" id="text-orgba2bcef">
+<p>
+By default Emacs looks a bit dated it also presents terribly in a Wayland compositor but with a little effort it cleans up nicely. One of the new features in Emacs is the ability to compile it as a pure GTK application. GTK applications work a lot better on Wayland and thankfully we don't need to compile it ourselves as it's available in the Nix store. Just like we did with the Python packages we can have our Nix shell use a string list to install our Emacs packages in our dev shell for us. I use a few of them here and will cover what they do later in the article.
+</p>
+<div class="org-src-container">
+<pre class="src src-nix">
+  ((emacsPackagesFor pkgs.emacs29-pgtk).emacsWithPackages (
+  epkgs: [
+    epkgs.htmlize
+    epkgs.nix-mode
+    epkgs.use-package
+    epkgs.nerd-icons
+    epkgs.evil-nerd-commenter
+    epkgs.doom-modeline
+    epkgs.all-the-icons
+    epkgs.doom-themes
+    epkgs.rainbow-delimiters
+    epkgs.org
+    epkgs.org-bullets
+    epkgs.visual-fill-column
+    epkgs.string-inflection
+  ]
+))
+</pre>
+</div>
+<p>
+We'll also need a few fonts and can't forget our spelling dictionary.
+</p>
+<div class="org-src-container">
+<pre class="src src-nix">
+emacs-all-the-icons-fonts
+dejavu_fonts
+hunspell
+hunspellDicts.en_US-large
+</pre>
+</div>
+<p>
+Pulling it all together for a complete set of packages makes our shell rather full. Though it could always be worse.
+</p>
+<div class="org-src-container">
+<pre class="src src-nix">
+<span style="color: #ffcb6b;">packages</span> = <span style="color: #89DDFF;">with</span> pkgs; [
+  (python3.withPackages (python-pkgs: [
+    python-pkgs.pelican
+    python-pkgs.ghp-import
+  ]))
+  ((emacsPackagesFor pkgs.emacs29-pgtk).emacsWithPackages (
+    epkgs: [
+      epkgs.htmlize
+      epkgs.nix-mode
+      epkgs.use-package
+      epkgs.nerd-icons
+      epkgs.evil-nerd-commenter
+      epkgs.doom-modeline
+      epkgs.all-the-icons
+      epkgs.doom-themes
+      epkgs.rainbow-delimiters
+      epkgs.org
+      epkgs.org-bullets
+      epkgs.visual-fill-column
+      epkgs.string-inflection
+    ]
+  ))
+  emacs-all-the-icons-fonts
+  dejavu_fonts
+  hunspell
+  hunspellDicts.en_US-large
+];
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge44742d" class="outline-2">
+<h2 id="orge44742d">A custom Emacs init for a comfortable experience</h2>
+<div class="outline-text-2" id="text-orge44742d">
+<p>
+Most of the init file I use here was either inspired by or downright stolen from <a href="https://github.com/daviwil">David Wilson</a> following his Emacs from scratch YouTube series on his <a href="https://www.youtube.com/@SystemCrafters">System Crafters</a> channel. He does a much better job of explaining everything then I ever could so I'll just cover the highlights here. If you're interested in learning how to configure and use Emacs I can't recommend his YouTube series enough.
+</p>
+</div>
+<div id="outline-container-org23e995e" class="outline-3">
+<h3 id="org23e995e">Stripping out the old Emacs UI elements</h3>
+<div class="outline-text-3" id="text-org23e995e">
+<p>
+Here I disable the title bar, button menu, and welcome page. And start setting up some basic fonts while enabling background opacity.
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">
+(<span style="color: #89DDFF;">setq</span> inhibit-startup-message t)
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(tooltip-mode -1)
+(set-fringe-mode 10)
+(menu-bar-mode -1)
+(<span style="color: #89DDFF;">setq</span> visible-bell t)
+(<span style="color: #89DDFF;">setq</span> select-enable-clipboard t)
+(mouse-avoidance-mode 'exile)
+(<span style="color: #89DDFF;">setq</span> frame-title-format <span style="color: #c3e88d;">"Emacs"</span>)
+(<span style="color: #89DDFF;">setq</span> warning-minimum-level <span style="color: #82aaff;">:emergency</span>)
+(<span style="color: #89DDFF;">defun</span> <span style="color: #82aaff;">sda/set-font-face</span> ()
+  (set-face-attribute 'default nil <span style="color: #82aaff;">:font</span> <span style="color: #c3e88d;">"DejaVuSansM Nerd Font 10"</span>)
+  (add-to-list 'default-frame-alist '(alpha-background . 90)))
+
+(<span style="color: #89DDFF;">if</span> (daemonp)
+    (add-hook 'after-make-frame-functions
+              (<span style="color: #89DDFF;">lambda</span> (frame)
+                (<span style="color: #89DDFF;">with-selected-frame</span> frame
+                  (sda/set-font-face)))))
+(sda/set-font-face)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb8f6885" class="outline-3">
+<h3 id="orgb8f6885">Getting started with packages</h3>
+<div class="outline-text-3" id="text-orgb8f6885">
+<p>
+Next I ensure access to the package archives and setup use-package.
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">
+(<span style="color: #89DDFF;">require</span> '<span style="color: #f78c6c;">package</span>)
+(<span style="color: #89DDFF;">setq</span> package-archives '((<span style="color: #c3e88d;">"melpa"</span> . <span style="color: #c3e88d;">"https://melpa.org/packages/"</span>)
+                         (<span style="color: #c3e88d;">"org"</span> . <span style="color: #c3e88d;">"https://orgmode.org/elpa/"</span>)
+                         (<span style="color: #c3e88d;">"gnu"</span> . <span style="color: #c3e88d;">"https://elpa.gnu.org/packages/"</span>)
+                         (<span style="color: #c3e88d;">"nongnu"</span> . <span style="color: #c3e88d;">"https://elpa.nongnu.org/nongnu/"</span>)))
+(package-initialize)
+(<span style="color: #89DDFF;">unless</span> package-archive-contents
+  (package-refresh-contents))
+(<span style="color: #89DDFF;">unless</span> (package-installed-p 'use-package)
+  (package-install 'use-package))
+(<span style="color: #89DDFF;">require</span> '<span style="color: #f78c6c;">use-package</span>)
+(<span style="color: #89DDFF;">setq</span> use-package-always-ensure t)
+(<span style="color: #89DDFF;">setq</span> use-package-verbose t)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org3ececae" class="outline-3">
+<h3 id="org3ececae">Emacs look and feel</h3>
+<div class="outline-text-3" id="text-org3ececae">
+<p>
+In the next section I setup a lot of the look and feel of Emacs in general as well as adding some nice quality of life keybindings.
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">
+(<span style="color: #89DDFF;">use-package</span> <span style="color: #f78c6c;">nerd-icons</span>
+  <span style="color: #82aaff;">:custom</span>
+  (nerd-icon-font-family <span style="color: #c3e88d;">"DejaVuSansM Nerd Font"</span>))
+
+(<span style="color: #89DDFF;">use-package</span> <span style="color: #f78c6c;">evil-nerd-commenter</span>
+  <span style="color: #82aaff;">:bind</span> (<span style="color: #c3e88d;">"M-/"</span> . evilnc-comment-or-uncomment-lines))
+
+(<span style="color: #89DDFF;">use-package</span> <span style="color: #f78c6c;">doom-modeline</span>
+  <span style="color: #82aaff;">:init</span> (doom-modeline-mode t)
+  <span style="color: #82aaff;">:custom</span> ((doom-modeline-height 4)))
+
+(<span style="color: #89DDFF;">use-package</span> <span style="color: #f78c6c;">all-the-icons</span>)
+
+(<span style="color: #89DDFF;">use-package</span> <span style="color: #f78c6c;">doom-themes</span>
+  <span style="color: #82aaff;">:init</span> (load-theme 'doom-palenight t))
+
+(column-number-mode)
+(global-display-line-numbers-mode t)
+(<span style="color: #89DDFF;">dolist</span> (mode '(org-mode-hook
+                term-mode-hook
+                eshell-mode-hook
+                shell-mode-hook))
+  (add-hook mode (<span style="color: #89DDFF;">lambda</span> () (display-line-numbers-mode 0))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd10e5e6" class="outline-3">
+<h3 id="orgd10e5e6">Configuring Org mode</h3>
+<div class="outline-text-3" id="text-orgd10e5e6">
+<p>
+This section is rather extensive. The majority of what I plan to do with this environment is write blog posts in org mode so getting Org mode into a comfortable state is worth the extra effort.
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">
+(<span style="color: #89DDFF;">defun</span> <span style="color: #82aaff;">sda/org-font-setup</span> ()
+  <span style="color: #676E95;">;; </span><span style="color: #676E95;">Replace list hyphen with dot</span>
+  (font-lock-add-keywords 'org-mode
+                          '((<span style="color: #c3e88d;">"^ *</span><span style="color: #89DDFF; font-weight: bold;">\\</span><span style="color: #89DDFF; font-weight: bold;">(</span><span style="color: #c3e88d;">[-]</span><span style="color: #89DDFF; font-weight: bold;">\\</span><span style="color: #89DDFF; font-weight: bold;">)</span><span style="color: #c3e88d;"> "</span>
+                             (0 (<span style="color: #89DDFF;">prog1</span> () (compose-region (match-beginning 1) (match-end 1) <span style="color: #c3e88d;">"&#8226;"</span>))))))
+  <span style="color: #676E95;">;; </span><span style="color: #676E95;">Disable org indent</span>
+  (<span style="color: #89DDFF;">setq</span> org-adapt-indentation nil)
+
+  <span style="color: #676E95;">;; </span><span style="color: #676E95;">Set faces for heading levels</span>
+  (<span style="color: #89DDFF;">dolist</span> (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.1)
+                  (org-level-3 . 1.05)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))
+    (set-face-attribute (car face) nil <span style="color: #82aaff;">:font</span> <span style="color: #c3e88d;">"DejaVu Sans Mono"</span> <span style="color: #82aaff;">:weight</span> 'regular <span style="color: #82aaff;">:height</span> (cdr face)))
+
+  <span style="color: #676E95;">;; </span><span style="color: #676E95;">Ensure that anything that should be fixed-pitch in Org files appears that way</span>
+  (set-face-attribute 'org-block nil    <span style="color: #82aaff;">:foreground</span> nil <span style="color: #82aaff;">:inherit</span> 'fixed-pitch)
+  (set-face-attribute 'org-table nil    <span style="color: #82aaff;">:inherit</span> 'fixed-pitch)
+  (set-face-attribute 'org-formula nil  <span style="color: #82aaff;">:inherit</span> 'fixed-pitch)
+  (set-face-attribute 'org-code nil     <span style="color: #82aaff;">:inherit</span> '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil    <span style="color: #82aaff;">:inherit</span> '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil <span style="color: #82aaff;">:inherit</span> '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil <span style="color: #82aaff;">:inherit</span> '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil <span style="color: #82aaff;">:inherit</span> '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil  <span style="color: #82aaff;">:inherit</span> 'fixed-pitch)
+  (set-face-attribute 'line-number nil <span style="color: #82aaff;">:inherit</span> 'fixed-pitch)
+  (set-face-attribute 'line-number-current-line nil <span style="color: #82aaff;">:inherit</span> 'fixed-pitch))
+
+(<span style="color: #89DDFF;">defun</span> <span style="color: #82aaff;">sda/org-mode-setup</span> ()
+  (org-indent-mode)
+  (turn-on-font-lock)
+  (variable-pitch-mode 1)
+  (visual-line-mode 1)
+  (<span style="color: #89DDFF;">setq</span> evil-auto-indent nil)
+  (<span style="color: #89DDFF;">setq</span> org-link-elisp-confirm-function nil)
+  (<span style="color: #89DDFF;">setq</span> org-export-backends
+        '(ascii html icalendar latex md odt))
+  (<span style="color: #89DDFF;">setq</span> org-todo-keywords
+        '((sequence <span style="color: #c3e88d;">"TODO"</span> <span style="color: #c3e88d;">"In Process"</span> <span style="color: #c3e88d;">"|"</span> <span style="color: #c3e88d;">"Done"</span> <span style="color: #c3e88d;">"Abandoned"</span>))))
+
+(<span style="color: #89DDFF;">use-package</span> <span style="color: #f78c6c;">org</span>
+  <span style="color: #82aaff;">:hook</span> (org-mode . sda/org-mode-setup)
+  <span style="color: #82aaff;">:config</span>
+  (sda/org-font-setup))
+
+(<span style="color: #89DDFF;">use-package</span> <span style="color: #f78c6c;">org-bullets</span>
+  <span style="color: #82aaff;">:hook</span> (org-mode . org-bullets-mode)
+  <span style="color: #82aaff;">:custom</span>
+  (org-bullets-bullet-list '(<span style="color: #c3e88d;">"&#9673;"</span> <span style="color: #c3e88d;">"&#9675;"</span> <span style="color: #c3e88d;">"&#9679;"</span> <span style="color: #c3e88d;">"&#9675;"</span> <span style="color: #c3e88d;">"&#9679;"</span> <span style="color: #c3e88d;">"&#9675;"</span> <span style="color: #c3e88d;">"&#9679;"</span>)))
+
+(<span style="color: #89DDFF;">defun</span> <span style="color: #82aaff;">sda/org-mode-visual-fill</span>()
+  (<span style="color: #89DDFF;">setq</span> visual-fill-column-width 150
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(<span style="color: #89DDFF;">use-package</span> <span style="color: #f78c6c;">visual-fill-column</span>
+  <span style="color: #82aaff;">:hook</span> (org-mode . sda/org-mode-visual-fill))
+
+(<span style="color: #89DDFF;">with-eval-after-load</span> 'org
+  (org-babel-do-load-languages
+   'org-bable-load-languages
+   '((emacs-lisp . t)))
+  (<span style="color: #89DDFF;">setq</span> org-confirm-babel-evaluate nil))
+
+(<span style="color: #89DDFF;">with-eval-after-load</span> 'org
+  (<span style="color: #89DDFF;">require</span> '<span style="color: #f78c6c;">org-tempo</span>)
+  (add-to-list 'org-structure-template-alist '(<span style="color: #c3e88d;">"sh"</span> . <span style="color: #c3e88d;">"src shell"</span>))
+  (add-to-list 'org-structure-template-alist '(<span style="color: #c3e88d;">"el"</span> . <span style="color: #c3e88d;">"src emacs-lisp"</span>))
+  (add-to-list 'org-structure-template-alist '(<span style="color: #c3e88d;">"ht"</span> . <span style="color: #c3e88d;">"src html"</span>))
+  (add-to-list 'org-structure-template-alist '(<span style="color: #c3e88d;">"md"</span> . <span style="color: #c3e88d;">"src markdown"</span>))
+  (add-to-list 'org-structure-template-alist '(<span style="color: #c3e88d;">"nx"</span> . <span style="color: #c3e88d;">"src nix"</span>))
+  (add-to-list 'org-structure-template-alist '(<span style="color: #c3e88d;">"pw"</span> . <span style="color: #c3e88d;">"src powershell"</span>)))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd15c070" class="outline-3">
+<h3 id="orgd15c070">Spell checking</h3>
+<div class="outline-text-3" id="text-orgd15c070">
+<p>
+Since these blog posts will available publicly having a good spell checker is crucial.
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">
+(<span style="color: #89DDFF;">setq</span> ispell-program-name <span style="color: #c3e88d;">"hunspell"</span>)
+
+<span style="color: #676E95;">;; </span><span style="color: #676E95;">"en_US" is key to lookup in `</span><span style="color: #f78c6c;">ispell-local-dictionary-alist</span><span style="color: #676E95;">'.</span>
+<span style="color: #676E95;">;; </span><span style="color: #676E95;">Please note it will be passed as default value to hunspell CLI `-d` option</span>
+<span style="color: #676E95;">;; </span><span style="color: #676E95;">if you don't manually setup `-d` in `ispell-local-dictionary-alist`</span>
+(<span style="color: #89DDFF;">setq</span> ispell-local-dictionary <span style="color: #c3e88d;">"en_US"</span>)
+
+(<span style="color: #89DDFF;">setq</span> ispell-local-dictionary-alist
+      '((<span style="color: #c3e88d;">"en_US"</span> <span style="color: #c3e88d;">"[[:alpha:]]"</span> <span style="color: #c3e88d;">"[</span><span style="color: #89DDFF; font-weight: bold;">^</span><span style="color: #c3e88d;">[:alpha:]]"</span> <span style="color: #c3e88d;">"[']"</span> nil (<span style="color: #c3e88d;">"-d"</span> <span style="color: #c3e88d;">"en_US"</span>) nil utf-8)))
+
+(autoload 'flyspell-mode <span style="color: #c3e88d;">"flyspell"</span> <span style="color: #8d92af;">"On-the-fly spelling checker."</span> t)
+(add-hook 'message-mode-hook 'turn-on-flyspell)
+(add-hook 'text-mode-hook 'turn-on-flyspell)
+(add-hook 'org-mode-hook 'flyspell-prog-mode)
+(<span style="color: #89DDFF;">defun</span> <span style="color: #82aaff;">turn-on-flyspell</span> ()
+  <span style="color: #8d92af;">"Force flyspell-mode on using a positive arg.  For use in hooks."</span>
+  (<span style="color: #89DDFF;">interactive</span>)
+  (flyspell-mode 1))
+
+(eval-after-load <span style="color: #c3e88d;">"flyspell"</span>
+  '(progn
+     (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
+     (define-key flyspell-mouse-map [mouse-3] #'undefined)))
+</pre>
+</div>
+<p>
+NixOs isn't like most other systems it doesn't like to let software packages access other software packages outside of dbus. So I have to tell hunspell where to find it's dictionaries. Thankfully this is accomplished with just a simple environment variable added to the shell.nix file
+</p>
+<div class="org-src-container">
+<pre class="src src-nix">
+<span style="color: #ffcb6b;">DICPATH</span> = <span style="color: #c3e88d;">"</span><span style="color: #89DDFF; font-weight: bold;">${</span>pkgs.hunspellDicts.en_US-large<span style="color: #89DDFF; font-weight: bold;">}</span><span style="color: #c3e88d;">/share/hunspell/"</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgcb84119" class="outline-3">
+<h3 id="orgcb84119">Extra functionality</h3>
+<div class="outline-text-3" id="text-orgcb84119">
+<p>
+Here we enable some packages. I don't need them customized or do any modifications here it's just extra functionally that I need here and I need it working
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">
+(<span style="color: #89DDFF;">require</span> '<span style="color: #f78c6c;">htmlize</span>)
+(<span style="color: #89DDFF;">require</span> '<span style="color: #f78c6c;">nix-mode</span>)
+(<span style="color: #89DDFF;">require</span> '<span style="color: #f78c6c;">string-inflection</span>)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org38d8fda" class="outline-3">
+<h3 id="org38d8fda">Custom functions</h3>
+<div class="outline-text-3" id="text-org38d8fda">
+<p>
+Until this point everything I've included in this new special dev shell init file has been a direct copy paste from my system init file. So why do this? Why not just use you system init file and call it a day? Two reasons: 1 Including it here that means no matter what as long as I have access to this Git repository and it's sub-modules I have my development environment ready go. It'll be exactly the way I left it. If for some reason I don't blog for three months or three years and a new version of Emacs is released my entire system configuration changes I don't have to retrain Emacs how to do what it's doing today. 2 Custom functions for this environment. You see I've been using Emacs for 30 some odd years now. My system configuration is so cluttered with functions I don't remember what half of them do any more. Having the custom functions here for this bespoke purpose means they're not in my system configuration where I may never find them again. Or make four of them because I keep forgetting that I already did it.
+</p>
+</div>
+<div id="outline-container-orgcb3b500" class="outline-4">
+<h4 id="orgcb3b500">Add Pelican header to a blog post</h4>
+<div class="outline-text-4" id="text-orgcb3b500">
+<p>
+This is another place I stumbled a bit. Pelican needs a header to perform it's metadata magic and I don't want to manually copy and paste that header each time I start a new post. I initially tried using auto-insert-mode for this but quickly found it was just appending the text and would do it each time I opened the file. It appears that the Emacs package header2 is how most people apply headers in Emacs these days but that package isn't available in the Nix store. I also want my file names to be taken from the blog title and saved in lower camel case. This particular kind of string manipulation is new to me in lisp so it took a bit of trial and error but we got there in the end
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">
+(<span style="color: #89DDFF;">defun</span> <span style="color: #82aaff;">sda/new-post</span> ()
+  (<span style="color: #89DDFF;">interactive</span>)
+  (<span style="color: #89DDFF;">setq</span> new-blog-post-title (read-from-minibuffer <span style="color: #c3e88d;">"Post name: "</span>))
+  (<span style="color: #89DDFF;">setq</span> new-blog-post-tags (read-from-minibuffer <span style="color: #c3e88d;">"Tags: "</span>))
+  (<span style="color: #89DDFF;">setq</span> new-blog-post-slug (downcase (replace-regexp-in-string <span style="color: #c3e88d;">"[</span><span style="color: #89DDFF; font-weight: bold;">^</span><span style="color: #c3e88d;">[:alpha:][:digit:]_-]"</span> <span style="color: #c3e88d;">""</span> (string-replace <span style="color: #c3e88d;">" "</span> <span style="color: #c3e88d;">"-"</span> new-blog-post-title))))
+  (<span style="color: #89DDFF;">setq</span> new-blog-post-file (concat <span style="color: #c3e88d;">"./content/blog/"</span> (string-inflection-lower-camelcase-function (string-replace <span style="color: #c3e88d;">" "</span> <span style="color: #c3e88d;">"_"</span> new-blog-post-title)) <span style="color: #c3e88d;">".org"</span>))
+  (<span style="color: #89DDFF;">let</span> ((org-capture-templates
+        `((<span style="color: #c3e88d;">"p"</span> <span style="color: #c3e88d;">"New Pelican blog post"</span> plain (file new-blog-post-file)
+           ,(concat <span style="color: #c3e88d;">"#+title: "</span> new-blog-post-title <span style="color: #c3e88d;">"\n#+DATE: "</span> (format-time-string <span style="color: #c3e88d;">"%Y-%m-%d"</span>) <span style="color: #c3e88d;">"\n#+AUTHOR: SpeDAllen\n#+PROPERTY: LANGUAGE en\n#+PROPERTY: SLUG "</span> new-blog-post-slug <span style="color: #c3e88d;">"\n#+PROPERTY: TAGS "</span> new-blog-post-tags <span style="color: #c3e88d;">"\n#+options: toc:nil num:nil ^:nil\n"</span>)))
+        )) <span style="color: #ffcb6b;">(org-capture)))</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orga141b3a" class="outline-2">
+<h2 id="orga141b3a">Final thoughts</h2>
+<div class="outline-text-2" id="text-orga141b3a">
+<p>
+With the custom function I can get a new blog post started very quickly. My workflow consists of navigating to the Git repository, running <code>nix develop</code>, toggling my terminal scratchpad out of the way, and running <code>M-x sda/new-post</code> after following the on screen prompts my new Org file is created and I can start adding content. Next week I plan to shift my focus back to Pelican. It's time to clean the site up a bit. Add a welcome page, about me, 404, and so on. Perhaps I'll even do something about this theme.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2024-05-05</p>
+<p class="author">Author: SpeDAllen</p>
+<p class="date">Created: 2024-05-09 do 22:03</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

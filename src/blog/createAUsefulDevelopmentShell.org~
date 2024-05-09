@@ -5,6 +5,7 @@
 #+PROPERTY: SLUG create-a-useful-dev-shell
 #+PROPERTY: TAGS flakes, blog, pelican, devShell, orgMode, emacs
 #+options: toc:nil num:nil ^:nil
+#+EXPORT_FILE_NAME: ../../content/blog/createAUsefulDevelopmentShell
 
 * Creating a useful dev shell for blogging
 In my previous post the shell.nix file was rather sparse. I was using it mostly to setup and use Pelican but dev shells in NixOs are far more useful then just providing build tools. They can provide your entire IDE as well. That's what I set out to do this weekend and I feel I've had some success so here's a post to share my experience.

@@ -5,8 +5,9 @@
 #+PROPERTY: SLUG create-a-useful-dev-shell
 #+PROPERTY: TAGS flakes, blog, pelican, devShell, orgMode, emacs
 #+options: toc:nil num:nil ^:nil
+#+EXPORT_FILE_NAME: ../../content/blog/createAUsefulDevelopmentShell
 
-* Creating a useful dev shell for blogging
+* My dev shell for blogging
 In my previous post the shell.nix file was rather sparse. I was using it mostly to setup and use Pelican but dev shells in NixOs are far more useful then just providing build tools. They can provide your entire IDE as well. That's what I set out to do this weekend and I feel I've had some success so here's a post to share my experience.
 ** False starts and missteps
 It feels like I can't do a lot of new things these days without first running face first into some brick walls. The first problem I ran into trying to use Emacs in the dev shell was Emacs by default will use the users Emacs init file. For some people this won't be a problem but my system Emacs version is different then the one in the dev shell so the init file was not compatible. I remembered the NixOs wiki went into detail on how to incorporate your lisp into your nix configuration so that's where I started. The NixOs wiki [[https://nixos.wiki/wiki/Emacs][article]] on Emacs is heavily reliant on the community overlay which I had never used. The article describes it's usage in a flake but in a dev shell. Trying to marry the two proved frustrating and ultimately unnecessary. I eventually realized that you can just supply a custom init file and make your dev shell load Emacs using that init file. The next wall I ran into came when trying to automate the addition of the header text that Pelican uses to supply metadata for the blog but more on that later.
@@ -264,6 +265,11 @@ Since these blog posts will available publicly having a good spell checker is cr
     '(progn
        (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
        (define-key flyspell-mouse-map [mouse-3] #'undefined)))
+#+end_src
+NixOs isn't like most other systems it doesn't like to let software packages access other software packages outside of dbus. So I have to tell hunspell where to find it's dictionaries. Thankfully this is accomplished with just a simple environment variable added to the shell.nix file
+#+begin_src nix
+
+  DICPATH = "${pkgs.hunspellDicts.en_US-large}/share/hunspell/";
 #+end_src
 ** Extra functionality
 Here we enable some packages. I don't need them customized or do any modifications here it's just extra functionally that I need here and I need it working

@@ -66,6 +66,8 @@
   ;; Disable org indent
   (setq org-adapt-indentation nil)
 
+  (setq org-html-htmlize-output-type 'inline-css)
+  
   ;; Set faces for heading levels
   (dolist (face '((org-level-1 . 1.2)
                   (org-level-2 . 1.1)
@@ -78,7 +80,7 @@
     (set-face-attribute (car face) nil :font "DejaVu Sans Mono" :weight 'regular :height (cdr face)))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block nil    :inherit 'fixed-pitch)
   (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
   (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
   (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
@@ -135,6 +137,16 @@
   (add-to-list 'org-structure-template-alist '("nx" . "src nix"))
   (add-to-list 'org-structure-template-alist '("pw" . "src powershell")))
 
+(defun my-org-inline-css-hook (exporter)
+  "Insert custom inline css"
+  (when (eq exporter 'html)
+    (let ((my-pre-bg (face-background 'default)))
+      (setq org-html-head-include-default-style nil)
+      (setq org-html-head
+            (format "<style type=\"text/css\">\n pre.src { background-color: %s;}</style>\n" my-pre-bg)))))
+
+(add-hook 'org-export-before-processing-hook 'my-org-inline-css-hook)
+
 (setq ispell-program-name "hunspell")
 
 ;; "en_US" is key to lookup in `ispell-local-dictionary-alist'.
@@ -174,9 +186,10 @@
   (setq new-blog-post-title (read-from-minibuffer "Post name: "))
   (setq new-blog-post-tags (read-from-minibuffer "Tags: "))
   (setq new-blog-post-slug (downcase (replace-regexp-in-string "[^[:alpha:][:digit:]_-]" "" (string-replace " " "-" new-blog-post-title))))
-  (setq new-blog-post-file (concat "./content/blog/" (string-inflection-lower-camelcase-function (string-replace " " "_" new-blog-post-title)) ".org"))
+  (setq new-blog-post-filename-base (string-inflection-lower-camelcase-function (string-replace " " "_" new-blog-post-title)))
+  (setq new-blog-post-file (concat "./src/blog/" new-blog-post-filename-base ".org"))
   (let ((org-capture-templates
         `(("p" "New Pelican blog post" plain (file new-blog-post-file)
-           ,(concat "#+title: " new-blog-post-title "\n#+DATE: " (format-time-string "%Y-%m-%d") "\n#+AUTHOR: SpeDAllen\n#+PROPERTY: LANGUAGE en\n#+PROPERTY: SLUG " new-blog-post-slug "\n#+PROPERTY: TAGS " new-blog-post-tags "\n#+options: toc:nil num:nil ^:nil\n")))
+           ,(concat "#+title: " new-blog-post-title "\n#+DATE: " (format-time-string "%Y-%m-%d") "\n#+AUTHOR: SpeDAllen\n#+PROPERTY: LANGUAGE en\n#+PROPERTY: SLUG " new-blog-post-slug "\n#+PROPERTY: TAGS " new-blog-post-tags "\n#+options: toc:nil num:nil ^:nil\n#+EXPORT_FILE_NAME: ../../content/blog/" (concat new-blog-post-filename-base ".html") "\n")))
 	)) (org-capture)))
 
