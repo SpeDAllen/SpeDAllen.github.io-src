@@ -97,6 +97,7 @@
   (turn-on-font-lock)
   (variable-pitch-mode 1)
   (visual-line-mode 1)
+  (setq org-html-validation-link nil)
   (setq evil-auto-indent nil)
   (setq org-link-elisp-confirm-function nil)
   (setq org-export-backends
@@ -135,17 +136,11 @@
   (add-to-list 'org-structure-template-alist '("ht" . "src html"))
   (add-to-list 'org-structure-template-alist '("md" . "src markdown"))
   (add-to-list 'org-structure-template-alist '("nx" . "src nix"))
+  (add-to-list 'org-structure-template-alist '("py" . "src python"))
   (add-to-list 'org-structure-template-alist '("pw" . "src powershell")))
 
-(defun my-org-inline-css-hook (exporter)
-  "Insert custom inline css"
-  (when (eq exporter 'html)
-    (let ((my-pre-bg (face-background 'default)))
-      (setq org-html-head-include-default-style nil)
-      (setq org-html-head
-            (format "<style type=\"text/css\">\n pre.src { background-color: %s;}</style>\n" my-pre-bg)))))
-
-(add-hook 'org-export-before-processing-hook 'my-org-inline-css-hook)
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
 
 (setq ispell-program-name "hunspell")
 
@@ -187,9 +182,17 @@
   (setq new-blog-post-tags (read-from-minibuffer "Tags: "))
   (setq new-blog-post-slug (downcase (replace-regexp-in-string "[^[:alpha:][:digit:]_-]" "" (string-replace " " "-" new-blog-post-title))))
   (setq new-blog-post-filename-base (string-inflection-lower-camelcase-function (string-replace " " "_" new-blog-post-title)))
-  (setq new-blog-post-file (concat "./src/blog/" new-blog-post-filename-base ".org"))
+  (setq new-blog-post-file (concat "./content/blog/" new-blog-post-filename-base ".org"))
+  (setq new-blog-title-line (concat "#+HTML_HEAD: <title>" new-blog-post-title "</title>"))
+  (setq new-blog-date-line (concat "#+HTML_HEAD: <meta name=\"date\" content=\"" (format-time-string "%Y-%m-%d") "\" />"))
+  (setq new-blog-slug-line (concat "#+HTML_HEAD: <meta name=\"slug\" content=\"" new-blog-post-slug "\" />"))
+  (setq new-blog-keywords-line (concat "#+HTML_HEAD: <meta name=\"keywords\" content=\"" new-blog-post-tags "\" />"))
+  (setq new-blog-language-line "#+HTML_HEAD: <meta name=\"language\" content=\"en\" />")
+  (setq new-blog-author-line "#+AUTHOR: SpeDAllen")
+  (setq new-blog-options-line "#+options: toc:nil num:nil ^:nil html-postamble:nil")
+  (setq new-blog-filename-line (concat "#+EXPORT_FILE_NAME: " new-blog-post-filename-base))
   (let ((org-capture-templates
         `(("p" "New Pelican blog post" plain (file new-blog-post-file)
-           ,(concat "#+title: " new-blog-post-title "\n#+DATE: " (format-time-string "%Y-%m-%d") "\n#+AUTHOR: SpeDAllen\n#+PROPERTY: LANGUAGE en\n#+PROPERTY: SLUG " new-blog-post-slug "\n#+PROPERTY: TAGS " new-blog-post-tags "\n#+options: toc:nil num:nil ^:nil\n#+EXPORT_FILE_NAME: ../../content/blog/" (concat new-blog-post-filename-base ".html") "\n")))
+           ,(concat new-blog-title-line "\n" new-blog-date-line "\n" new-blog-keywords-line "\n" new-blog-slug-line "\n" new-blog-language-line "\n" new-blog-author-line "\n" new-blog-options-line "\n" new-blog-filename-line "\n\n")))
 	)) (org-capture)))
 

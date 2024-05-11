@@ -22,6 +22,7 @@ THEME = "./pelican-twitchy-mod/"
 RECENT_POST_COUNT = 5
 EXPAND_LATEST_ON_INDEX = True
 DISPLAY_RECENT_POSTS_ON_MENU = True
+DISPLAY_CATEGORIES_ON_MENU = False
 BOOTSTRAP_THEME = "lumen"
 OPEN_GRAPH = True
 TYPOGRIFY = False
@@ -46,6 +47,3 @@ DEFAULT_PAGINATION = 10
 #RELATIVE_URLS = True
 
 # PLUGIN_PATHS = ['./pelican-plugins']
-# PLUGINS = ['org_reader']
-# ORG_READER_EMACS_LOCATION = 'emacs'
-# ORG_READER_EMACS_SETTINGS = './pelican.el'

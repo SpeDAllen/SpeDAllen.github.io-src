@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-05-11 za 14:08 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="author" content="SpeDAllen" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<title>Theming the blog</title>
+<meta name="date" content="2024-05-11" />
+<meta name="slug" content="theming-the-blog" />
+<meta name="keywords" content="blog, orgMode, pelican" />
+<meta name="language" content="en" />
+</head>
+<body>
+<div id="content" class="content">
+
+<div id="outline-container-org79bb257" class="outline-2">
+<h2 id="org79bb257">Refining the look and feel of this blog</h2>
+<div class="outline-text-2" id="text-org79bb257">
+<p>
+I'm sure this will be an ongoing process but getting to the point the site is at currently took quite some doing so I want to capture what I've done so far so anyone wishing to follow along can.
+</p>
+</div>
+<div id="outline-container-org830d361" class="outline-3">
+<h3 id="org830d361">Git submodules need to be populated before they're useful</h3>
+<div class="outline-text-3" id="text-org830d361">
+<p>
+At first I couldn't get any theme applied. No matter what I did nothing would change the look of the output. It took an embarrassingly long amount of time to realize that the submodules I included for themes and plugins weren't populated with any content. Forgive me as I'm rather new to submodules in git. Once I found the command <code>git submodule update --init --recursive</code> I had what I needed.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd41e4b5" class="outline-3">
+<h3 id="orgd41e4b5">Landing on a theme</h3>
+<div class="outline-text-3" id="text-orgd41e4b5">
+<p>
+It took a good long while to find the right theme. My idea behind this blog is to have something that's relatively professional. I want it to both look nice with a fair amount of flash without going overboard. In other words it should not be embarrassing if my employer finds it. I think I found what I'm looking for in pelican-twitchy. It needed some mods which I'll get into later and I had to adjust my workflow to accommodate pelican but it's coming together. 
+</p>
+</div>
+</div>
+<div id="outline-container-org77c8541" class="outline-3">
+<h3 id="org77c8541">Fighting with code blocks</h3>
+<div class="outline-text-3" id="text-org77c8541">
+<p>
+You've probably noticed I use a lot of code blocks in my blogs. That's because a lot my blog is me discussing the code that I write and use. Ideally the code blocks that show up on the blog should appear as close to possible to what I see in my text editor, Emacs. Sadly that's just not possible with the org_reader plugin for pelican. By default code blocks were displaying as a simple black box with white text. Inline code was just bold. I had hoped that applying a theme would improve things but no it made things much worse. Instead of a readable black box with white text I had a gray box with slightly darker gray text. I tried in vein to use the pelican theme to apply <a href="https://pygments.org/">pygments</a> to the code blocks. Only to discover that they would only work with markdown. Purely by chance I used org-modes export to html feature and noticed pelican processing the html. Ah Ha! Pelican has a built-in html reader. Comparing the two pages one generated by org_reader and the other generated from html I noticed the html processed page had some syntax highlighting. It was difficult to see the highlighted text in the code blocks as the colors are meant for dark mode but it was there. The primary text was now black so at least I could read it.
+</p>
+</div>
+<div id="outline-container-org30d74be" class="outline-4">
+<h4 id="org30d74be">The code block backgrounds</h4>
+<div class="outline-text-4" id="text-org30d74be">
+<p>
+I had to change the background color of the code blocks before I could see what I was doing. Comparing the org generated html with the pelican generated html the code blocks looked identical. Checking online I found several pages that claim pelican doesn't do any styling of code blocks. To my mind that must mean it's just taking the org generated html for the code blocks wholesale and passing it on. Diving into org modes export feature I eventually managed to change the background color of the exported html only to find pelican then clobbered that setting and reinforcing the gray background. So much for listening to random people on the internet.
+I then decided that the theme was to blame surly different color themes would use a different color style for code blocks right? After an hour or so of trying different themes only to be met with the same ugly code blocks I was ready to give up and just convert to markdown and <a href="https://pygments.org/">pygments</a>. But there had to be a way. That's when I remembered that Firefox has built-in web developer tools. That could tell me which of the style sheets were setting the code block background. After making a copy of the pelican-twitchy theme so I could make modifications without causing issues in the submodule I found the code block background value in <code>./pelican-twitch-mod/static/css/boostrap.lumen.min.css</code> and set it to my preferred shade of dark blue. Great now I can see my syntax highlighting and as expected it's identical to what I see in Emacs. But the primary text color was now black. Black on dark blue is also unreadable. Thankfully the code blocks primary text color is set in the same block of css as the background. After changing it to white I could finally had the code blocks I was looking for. After changing these values in the same css file for inline code I was done. For now anyway.
+</p>
+</div>
+</div>
+<div id="outline-container-org4f0bbb3" class="outline-4">
+<h4 id="org4f0bbb3">Rainbow delimiters</h4>
+<div class="outline-text-4" id="text-org4f0bbb3">
+<p>
+While looking online for solutions to my various issues I came across several people discussing a incompatibility with the Emacs package rainbow-delimiters and org-mode export to html. In my testing this bug has been fixed so I enabled the package in the dev shell's Emacs lisp.
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">
+<span style="color: #c792ea;">(</span><span style="color: #89DDFF;">use-package</span> <span style="color: #f78c6c;">rainbow-delimiters</span>
+  <span style="color: #82aaff;">:hook</span> <span style="color: #f78c6c;">(</span>prog-mode . rainbow-delimiters-mode<span style="color: #f78c6c;">)</span><span style="color: #c792ea;">)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org50ea5f6" class="outline-3">
+<h3 id="org50ea5f6">Setting up the new workflow</h3>
+<div class="outline-text-3" id="text-org50ea5f6">
+<p>
+To pelicans credit applying the theme was a simple matter of adding the corresponding attributes to the pelicanconfig.conf file. All of this was explained in the pelican-twitchy documentation. I'll probably take advantage of more of the themes features in the future but for now this is a good start.
+</p>
+<div class="org-src-container">
+<pre class="src src-python">
+<span style="color: #ffcb6b;">THEME</span> = <span style="color: #c3e88d;">"./pelican-twitchy-mod/"</span>
+<span style="color: #ffcb6b;">RECENT_POST_COUNT</span> = 5
+<span style="color: #ffcb6b;">EXPAND_LATEST_ON_INDEX</span> = <span style="color: #f78c6c;">True</span>
+<span style="color: #ffcb6b;">DISPLAY_RECENT_POSTS_ON_MENU</span> = <span style="color: #f78c6c;">True</span>
+<span style="color: #ffcb6b;">DISPLAY_CATEGORIES_ON_MENU</span> = <span style="color: #f78c6c;">False</span>
+<span style="color: #ffcb6b;">BOOTSTRAP_THEME</span> = <span style="color: #c3e88d;">"lumen"</span>
+<span style="color: #ffcb6b;">OPEN_GRAPH</span> = <span style="color: #f78c6c;">True</span>
+<span style="color: #ffcb6b;">TYPOGRIFY</span> = <span style="color: #f78c6c;">False</span>
+</pre>
+</div>
+<p>
+Since I don't need two copies for every blog post I needed to disable pelicans org_reader by removing the associated line in pelicanconfig.conf.
+</p>
+<div class="org-src-container">
+<pre class="src src-python">
+<span style="color: #ffcb6b;">PLUGINS</span> = <span style="color: #c792ea;">[</span><span style="color: #c3e88d;">'org_reader'</span><span style="color: #c792ea;">]</span>
+</pre>
+</div>
+<p>
+Pelican interprets the html in a very straightforward manner, reading metadata from <code>meta</code> tags. Refer to <a href="https://docs.getpelican.com/en/3.6.3/content.html">their documentation</a> for the details. After manually modifying the headers of the existing org files I needed to update the custom Emacs function to produce the headers I need. Doing multiple layers of string concatenation in a single line was starting to make my head spin so I made a variable per line. Breaking up the header like that makes the function more readable I think. Here's the resulting function.
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">
+<span style="color: #c792ea;">(</span><span style="color: #89DDFF;">defun</span> <span style="color: #82aaff;">sda/new-post</span> <span style="color: #f78c6c;">()</span>
+  <span style="color: #f78c6c;">(</span><span style="color: #89DDFF;">interactive</span><span style="color: #f78c6c;">)</span>
+  <span style="color: #f78c6c;">(</span><span style="color: #89DDFF;">setq</span> new-blog-post-title <span style="color: #c3e88d;">(</span>read-from-minibuffer <span style="color: #c3e88d;">"Post name: "</span><span style="color: #c3e88d;">)</span><span style="color: #f78c6c;">)</span>
+  <span style="color: #f78c6c;">(</span><span style="color: #89DDFF;">setq</span> new-blog-post-tags <span style="color: #c3e88d;">(</span>read-from-minibuffer <span style="color: #c3e88d;">"Tags: "</span><span style="color: #c3e88d;">)</span><span style="color: #f78c6c;">)</span>
+  <span style="color: #f78c6c;">(</span><span style="color: #89DDFF;">setq</span> new-blog-post-slug <span style="color: #c3e88d;">(</span>downcase <span style="color: #89DDFF;">(</span>replace-regexp-in-string <span style="color: #c3e88d;">"[</span><span style="color: #89DDFF; font-weight: bold;">^</span><span style="color: #c3e88d;">[:alpha:][:digit:]_-]"</span> <span style="color: #c3e88d;">""</span> <span style="color: #bb80b3;">(</span>string-replace <span style="color: #c3e88d;">" "</span> <span style="color: #c3e88d;">"-"</span> new-blog-post-title<span style="color: #bb80b3;">)</span><span style="color: #89DDFF;">)</span><span style="color: #c3e88d;">)</span><span style="color: #f78c6c;">)</span>
+  <span style="color: #f78c6c;">(</span><span style="color: #89DDFF;">setq</span> new-blog-post-filename-base <span style="color: #c3e88d;">(</span>string-inflection-lower-camelcase-function <span style="color: #89DDFF;">(</span>string-replace <span style="color: #c3e88d;">" "</span> <span style="color: #c3e88d;">"_"</span> new-blog-post-title<span style="color: #89DDFF;">)</span><span style="color: #c3e88d;">)</span><span style="color: #f78c6c;">)</span>
+  <span style="color: #f78c6c;">(</span><span style="color: #89DDFF;">setq</span> new-blog-post-file <span style="color: #c3e88d;">(</span>concat <span style="color: #c3e88d;">"./content/blog/"</span> new-blog-post-filename-base <span style="color: #c3e88d;">".org"</span><span style="color: #c3e88d;">)</span><span style="color: #f78c6c;">)</span>
+  <span style="color: #f78c6c;">(</span><span style="color: #89DDFF;">setq</span> new-blog-title-line <span style="color: #c3e88d;">(</span>concat <span style="color: #c3e88d;">"#+HTML_HEAD: &lt;title&gt;"</span> new-blog-post-title <span style="color: #c3e88d;">"&lt;/title&gt;"</span><span style="color: #c3e88d;">)</span><span style="color: #f78c6c;">)</span>
+  <span style="color: #f78c6c;">(</span><span style="color: #89DDFF;">setq</span> new-blog-date-line <span style="color: #c3e88d;">(</span>concat <span style="color: #c3e88d;">"#+HTML_HEAD: &lt;meta name=\"date\" content=\""</span> <span style="color: #89DDFF;">(</span>format-time-string <span style="color: #c3e88d;">"%Y-%m-%d"</span><span style="color: #89DDFF;">)</span> <span style="color: #c3e88d;">"\" /&gt;"</span><span style="color: #c3e88d;">)</span><span style="color: #f78c6c;">)</span>
+  <span style="color: #f78c6c;">(</span><span style="color: #89DDFF;">setq</span> new-blog-slug-line <span style="color: #c3e88d;">(</span>concat <span style="color: #c3e88d;">"#+HTML_HEAD: &lt;meta name=\"slug\" content=\""</span> new-blog-post-slug <span style="color: #c3e88d;">"\" /&gt;"</span><span style="color: #c3e88d;">)</span><span style="color: #f78c6c;">)</span>
+  <span style="color: #f78c6c;">(</span><span style="color: #89DDFF;">setq</span> new-blog-keywords-line <span style="color: #c3e88d;">(</span>concat <span style="color: #c3e88d;">"#+HTML_HEAD: &lt;meta name=\"keywords\" content=\""</span> new-blog-post-tags <span style="color: #c3e88d;">"\" /&gt;"</span><span style="color: #c3e88d;">)</span><span style="color: #f78c6c;">)</span>
+  <span style="color: #f78c6c;">(</span><span style="color: #89DDFF;">setq</span> new-blog-language-line <span style="color: #c3e88d;">"#+HTML_HEAD: &lt;meta name=\"language\" content=\"en\" /&gt;"</span><span style="color: #f78c6c;">)</span>
+  <span style="color: #f78c6c;">(</span><span style="color: #89DDFF;">setq</span> new-blog-author-line <span style="color: #c3e88d;">"#+AUTHOR: SpeDAllen"</span><span style="color: #f78c6c;">)</span>
+  <span style="color: #f78c6c;">(</span><span style="color: #89DDFF;">setq</span> new-blog-options-line <span style="color: #c3e88d;">"#+options: toc:nil num:nil ^:nil html-postamble:nil"</span><span style="color: #f78c6c;">)</span>
+  <span style="color: #f78c6c;">(</span><span style="color: #89DDFF;">setq</span> new-blog-filename-line <span style="color: #c3e88d;">(</span>concat <span style="color: #c3e88d;">"#+EXPORT_FILE_NAME: "</span> new-blog-post-filename-base<span style="color: #c3e88d;">)</span><span style="color: #f78c6c;">)</span>
+  <span style="color: #f78c6c;">(</span><span style="color: #89DDFF;">let</span> <span style="color: #c3e88d;">(</span><span style="color: #89DDFF;">(</span>org-capture-templates
+        `<span style="color: #bb80b3;">(</span><span style="color: #ffcb6b;">(</span><span style="color: #c3e88d;">"p"</span> <span style="color: #c3e88d;">"New Pelican blog post"</span> plain <span style="color: #82aaff;">(</span>file new-blog-post-file<span style="color: #82aaff;">)</span>
+           ,<span style="color: #82aaff;">(</span>concat new-blog-title-line <span style="color: #c3e88d;">"\n"</span> new-blog-date-line <span style="color: #c3e88d;">"\n"</span> new-blog-keywords-line <span style="color: #c3e88d;">"\n"</span> new-blog-slug-line <span style="color: #c3e88d;">"\n"</span> new-blog-language-line <span style="color: #c3e88d;">"\n"</span> new-blog-author-line <span style="color: #c3e88d;">"\n"</span> new-blog-options-line <span style="color: #c3e88d;">"\n"</span> new-blog-filename-line <span style="color: #c3e88d;">"\n\n"</span><span style="color: #82aaff;">)</span><span style="color: #ffcb6b;">)</span><span style="color: #bb80b3;">)</span>
+        <span style="color: #89DDFF;">)</span><span style="color: #c3e88d;">)</span> <span style="color: #c3e88d;">(</span><span style="color: #ffcb6b;">org-capture</span><span style="color: #c3e88d;">)</span><span style="color: #f78c6c;">)</span><span style="color: #c792ea;">)</span>
+</pre>
+</div>
+<p>
+Ultimately my workflow doesn't change much. I still cd into the blog git repository, run <code>nix develop</code>, then inside Emacs run <code>M-x sda/new-post</code>, and fill in the content of my new post. Only now I need to save then export that content to html before pelican will pick it up. If you're new to Emacs org-mode the default keybinding for that is <code>C-x C-s C-c C-e h h</code>
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb16b5e5" class="outline-2">
+<h2 id="orgb16b5e5">Final thoughts</h2>
+<div class="outline-text-2" id="text-orgb16b5e5">
+<p>
+I'm rather happy with how the site it coming along. It's strangely satisfying to see the results of all this struggle and heartache. My inexperience as a web developer is really rearing it's ugly head. Not that this blog makes me in any way a web developer. I work with people who are and they would laugh my struggles off as child's play. To me, someone who has zero experience or formal training as a web developer, this site is a minor accomplishment. So don't mind me if I take some amount of pride in it.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>

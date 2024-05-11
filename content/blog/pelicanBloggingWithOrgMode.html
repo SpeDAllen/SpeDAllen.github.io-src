@@ -3,70 +3,252 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-05-09 do 21:34 -->
+<!-- 2024-05-11 za 10:56 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Pelican blogging with Org mode</title>
-<meta name="author" content="public" />
+<title>&lrm;</title>
+<meta name="author" content="SpeDAllen" />
 <meta name="generator" content="Org Mode" />
-<style type="text/css">
- pre.src { background-color: #292D3E;}</style>
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<title>Pelican blogging with Org mode</title>
+<meta name="date" content="2024-04-27 14:59" />
+<meta name="SLUG" content="pelican-blogging-with-org-mode" />
+<meta name="keywords" content="flakes, blog, pelican, devShell, orgMode, gitHub" />
+<meta name="language" content="en" />
 </head>
 <body>
 <div id="content" class="content">
-<h1 class="title">Pelican blogging with Org mode</h1>
 
-<div id="outline-container-orgb41e4cb" class="outline-2">
-<h2 id="orgb41e4cb">Setting up this blog</h2>
-<div class="outline-text-2" id="text-orgb41e4cb">
-</div>
-<div id="outline-container-orge575d06" class="outline-3">
-<h3 id="orge575d06">GitHub pages</h3>
-<div class="outline-text-3" id="text-orge575d06">
+<div id="outline-container-orgdb95524" class="outline-3">
+<h3 id="orgdb95524">GitHub pages</h3>
+<div class="outline-text-3" id="text-orgdb95524">
 <p>
 GitHub will host your static web pages for you even on a free account making it rather ideal for a blog hosting platform.
 </p>
 </div>
 </div>
-<div id="outline-container-org5eb4463" class="outline-3">
-<h3 id="org5eb4463">Pelican</h3>
-<div class="outline-text-3" id="text-org5eb4463">
+<div id="outline-container-org45c69e1" class="outline-3">
+<h3 id="org45c69e1">Pelican</h3>
+<div class="outline-text-3" id="text-org45c69e1">
 <p>
 But before setting anything up in GitHub you should decide on your tooling. There are several site generators freely available with <a href="https://jekyllrb.com/">Jenkyll</a> probably being the most popular. I initially was going to use <a href="https://jekyllrb.com/">Jenkyll</a> but after noticing it's license I decided to look for alternatives. <a href="https://www.sitepoint.com/6-static-blog-generators-arent-jekyll/">Using this article</a> I found Pelican which is licensed with AGPL which I feel offers more protection from open source exploitation. 
 </p>
 </div>
 </div>
-<div id="outline-container-org113b3d4" class="outline-3">
-<h3 id="org113b3d4">Git started</h3>
-<div class="outline-text-3" id="text-org113b3d4">
+<div id="outline-container-org92f1f8b" class="outline-3">
+<h3 id="org92f1f8b">Git started</h3>
+<div class="outline-text-3" id="text-org92f1f8b">
 <p>
 With my tooling and hosting platform decided upon I followed this <a href="https://fedoramagazine.org/make-github-pages-blog-with-pelican/">Fedoria magazine article</a> to setup the basic Git structure. I use NixOs so not every applies to me but it was very helpful. They casually mention initializing your source repository with a readme but I found out the hard way that it's better to initialize it with a python .gitignore file.
 </p>
 </div>
 </div>
-<div id="outline-container-org6e79d8b" class="outline-3">
-<h3 id="org6e79d8b">Dev environment</h3>
-<div class="outline-text-3" id="text-org6e79d8b">
+<div id="outline-container-org0566b33" class="outline-3">
+<h3 id="org0566b33">Dev environment</h3>
+<div class="outline-text-3" id="text-org0566b33">
 <p>
 With a place to store and track my progress setup it was time to install the tools. I started with setting up a flake that I could use to version control the software used. It's not complicated if your accustomed to flakes.
 </p>
 <div class="org-src-container">
 <pre class="src src-nix">
-{
+<span style="color: #c792ea;">{</span>
   <span style="color: #ffcb6b;">description</span> = <span style="color: #c3e88d;">"blog"</span>;
   <span style="color: #ffcb6b;">inputs</span> =
-    {
+    <span style="color: #f78c6c;">{</span>
       <span style="color: #ffcb6b;">nixpkgs.url</span> = <span style="color: #c3e88d;">"github:nixos/nixpkgs/23.11"</span>;
-     };
-  <span style="color: #ffcb6b;">outputs</span> = { self, nixpkgs }:
+     <span style="color: #f78c6c;">}</span>;
+  <span style="color: #ffcb6b;">outputs</span> = <span style="color: #f78c6c;">{</span> self, nixpkgs <span style="color: #f78c6c;">}</span>:
     <span style="color: #89DDFF;">let</span>
       <span style="color: #ffcb6b;">system</span> = <span style="color: #c3e88d;">"x86_64-linux"</span>;
-      <span style="color: #ffcb6b;">pkgs</span> = nixpkgs.legacyPackages.${system};
+      <span style="color: #ffcb6b;">pkgs</span> = nixpkgs.legacyPackages.$<span style="color: #f78c6c;">{</span>system<span style="color: #f78c6c;">}</span>;
     <span style="color: #89DDFF;">in</span>
-    {
-      <span style="color: #ffcb6b;">devShells.x86_64-linux.default</span> = ( <span style="color: #82aaff;">import</span> <span style="color: #f78c6c;">./shell.nix</span> { <span style="color: #89DDFF;">inherit</span> pkgs; });
-    };
-}
+    <span style="color: #f78c6c;">{</span>
+      <span style="color: #ffcb6b;">devShells.x86_64-linux.default</span> = <span style="color: #c3e88d;">(</span> <span style="color: #82aaff;">import</span> <span style="color: #f78c6c;">./shell.nix</span> <span style="color: #89DDFF;">{</span> <span style="color: #89DDFF;">inherit</span> pkgs; <span style="color: #89DDFF;">}</span><span style="color: #c3e88d;">)</span>;
+    <span style="color: #f78c6c;">}</span>;
+<span style="color: #c792ea;">}</span>
 </pre>
 </div>
 <p>
@@ -74,19 +256,19 @@ Basically you specify your sources and where you want to use them and Nix takes 
 </p>
 <div class="org-src-container">
 <pre class="src src-nix">
-{ pkgs ? <span style="color: #82aaff;">import</span> <span style="color: #f78c6c;">&lt;nixpkgs&gt;</span> { } }:
+<span style="color: #c792ea;">{</span> pkgs ? <span style="color: #82aaff;">import</span> <span style="color: #f78c6c;">&lt;nixpkgs&gt;</span> <span style="color: #f78c6c;">{</span> <span style="color: #f78c6c;">}</span> <span style="color: #c792ea;">}</span>:
 pkgs.mkShell
-  {
-    <span style="color: #ffcb6b;">packages</span> = [
-      (pkgs.python3.withPackages (python-pkgs: [
+  <span style="color: #c792ea;">{</span>
+    <span style="color: #ffcb6b;">packages</span> = <span style="color: #f78c6c;">[</span>
+      <span style="color: #c3e88d;">(</span>pkgs.python3.withPackages <span style="color: #89DDFF;">(</span>python-pkgs: <span style="color: #bb80b3;">[</span>
         python-pkgs.pelican
         python-pkgs.ghp-import
-      ]))
+      <span style="color: #bb80b3;">]</span><span style="color: #89DDFF;">)</span><span style="color: #c3e88d;">)</span>
       pkgs.emacs
       pkgs.emacsPackages.htmlize
       pkgs.emacsPackages.nix-mode
-    ];
-  }
+    <span style="color: #f78c6c;">]</span>;
+  <span style="color: #c792ea;">}</span>
 </pre>
 </div>
 <p>
@@ -103,48 +285,48 @@ That will process the source files and serve the sight at <a href="http://127.0.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf45db7b" class="outline-3">
-<h3 id="orgf45db7b">Org mode blogging with Pelican</h3>
-<div class="outline-text-3" id="text-orgf45db7b">
+<div id="outline-container-org964bddc" class="outline-3">
+<h3 id="org964bddc">Org mode blogging with Pelican</h3>
+<div class="outline-text-3" id="text-org964bddc">
 <p>
 Out of the box Pelican doesn't support org documents as source but there are three plugins you can use.
 </p>
 </div>
-<div id="outline-container-org5d93dc4" class="outline-4">
-<h4 id="org5d93dc4">org_pandoc_reader</h4>
-<div class="outline-text-4" id="text-org5d93dc4">
+<div id="outline-container-org33f0bff" class="outline-4">
+<h4 id="org33f0bff">org_pandoc_reader</h4>
+<div class="outline-text-4" id="text-org33f0bff">
 <p>
 It appears to be very simple to use but it sadly hasn't been maintained. Requiring a very old version of python that's no longer available in the Nix packages.
 </p>
 </div>
 </div>
-<div id="outline-container-org28a5cd0" class="outline-4">
-<h4 id="org28a5cd0">org_python_reader</h4>
-<div class="outline-text-4" id="text-org28a5cd0">
+<div id="outline-container-orgfbd1b72" class="outline-4">
+<h4 id="orgfbd1b72">org_python_reader</h4>
+<div class="outline-text-4" id="text-orgfbd1b72">
 <p>
 Is newer but sadly one of it's dependencies pyton-orgco isn't packaged by nix yet.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfccd125" class="outline-4">
-<h4 id="orgfccd125">org_reader</h4>
-<div class="outline-text-4" id="text-orgfccd125">
+<div id="outline-container-orgcdb1302" class="outline-4">
+<h4 id="orgcdb1302">org_reader</h4>
+<div class="outline-text-4" id="text-orgcdb1302">
 <p>
 Is the most logical of the org plugins available requiring only emacs which you're probably using to author your org documents anyway. It needs to know the path to emacs which is complicated by running nix shell on NixOS.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org06ffee4" class="outline-3">
-<h3 id="org06ffee4">Installing and configuring org_reader</h3>
-<div class="outline-text-3" id="text-org06ffee4">
+<div id="outline-container-org2f2ba09" class="outline-3">
+<h3 id="org2f2ba09">Installing and configuring org_reader</h3>
+<div class="outline-text-3" id="text-org2f2ba09">
 <p>
 I chose to add the pelican plugins repo as a git submodule to keep everything contained and make my paths simple. It's may not be the best solution but since I already have a submodule for the output why not add more? Per the plugins documentation I only needed to tell Pelican where to find the plugins and define what to use.
 </p>
 <div class="org-src-container">
 <pre class="src src-python">
-<span style="color: #ffcb6b;">PLUGIN_PATHS</span> = [<span style="color: #c3e88d;">'./pelican-plugins'</span>]
-<span style="color: #ffcb6b;">PLUGINS</span> = [<span style="color: #c3e88d;">'org_reader'</span>]
+<span style="color: #ffcb6b;">PLUGIN_PATHS</span> = <span style="color: #c792ea;">[</span><span style="color: #c3e88d;">'./pelican-plugins'</span><span style="color: #c792ea;">]</span>
+<span style="color: #ffcb6b;">PLUGINS</span> = <span style="color: #c792ea;">[</span><span style="color: #c3e88d;">'org_reader'</span><span style="color: #c792ea;">]</span>
 </pre>
 </div>
 <p>
@@ -152,41 +334,34 @@ Telling org_reader where to find emacs in a nix shell dev environment was a bit 
 </p>
 <div class="org-src-container">
 <pre class="src src-nix">
-  { pkgs ? <span style="color: #82aaff;">import</span> <span style="color: #f78c6c;">&lt;nixpkgs&gt;</span> { } }:
+  <span style="color: #c792ea;">{</span> pkgs ? <span style="color: #82aaff;">import</span> <span style="color: #f78c6c;">&lt;nixpkgs&gt;</span> <span style="color: #f78c6c;">{</span> <span style="color: #f78c6c;">}</span> <span style="color: #c792ea;">}</span>:
 pkgs.mkShell
-  {
-    <span style="color: #ffcb6b;">packages</span> = [
-      (pkgs.python3.withPackages (python-pkgs: [
+  <span style="color: #c792ea;">{</span>
+    <span style="color: #ffcb6b;">packages</span> = <span style="color: #f78c6c;">[</span>
+      <span style="color: #c3e88d;">(</span>pkgs.python3.withPackages <span style="color: #89DDFF;">(</span>python-pkgs: <span style="color: #bb80b3;">[</span>
         python-pkgs.pelican
         python-pkgs.ghp-import
-      ]))
+      <span style="color: #bb80b3;">]</span><span style="color: #89DDFF;">)</span><span style="color: #c3e88d;">)</span>
       pkgs.emacs
       pkgs.emacsPackages.htmlize
       pkgs.emacsPackages.nix-mode
-    ];
+    <span style="color: #f78c6c;">]</span>;
     <span style="color: #676E95;"># shellHook = ''</span>
     <span style="color: #676E95;">#   echo ORG_READER_EMACS_LOCATION = \'${pkgs.emacs}/bin/emacs\' &gt;&gt; ./pelicanconf.py</span>
     <span style="color: #676E95;"># '';</span>
-  }
+  <span style="color: #c792ea;">}</span>
 </pre>
 </div>
 </div>
 </div>
-</div>
-<div id="outline-container-org2423c1b" class="outline-2">
-<h2 id="org2423c1b">Final thoughts</h2>
-<div class="outline-text-2" id="text-org2423c1b">
+<div id="outline-container-org5ee1a67" class="outline-2">
+<h2 id="org5ee1a67">Final thoughts</h2>
+<div class="outline-text-2" id="text-org5ee1a67">
 <p>
 There's work still to be done with the syntax highlighting some formatting I'd like to improve but that can be tomorrows problem.
 </p>
 </div>
 </div>
-</div>
-<div id="postamble" class="status">
-<p class="date">Date: 2024-04-27 14:59</p>
-<p class="author">Author: public</p>
-<p class="date">Created: 2024-05-09 do 21:34</p>
-<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
 </html>

@@ -1,0 +1,97 @@
+#+HTML_HEAD: <title>Pelican blogging with Org mode</title>
+#+HTML_HEAD: <meta name="date" content="2024-04-27 14:59" />
+#+HTML_HEAD: <meta name="SLUG" content="pelican-blogging-with-org-mode" />
+#+HTML_HEAD: <meta name="keywords" content="flakes, blog, pelican, devShell, orgMode, gitHub" />
+#+HTML_HEAD: <meta name="language" content="en" />
+#+AUTHOR: SpeDAllen
+#+OPTIONS: toc:nil num:nil ^:nil html-postamble:nil
+#+EXPORT_FILE_NAME: pelicanBloggingWithOrgMode
+
+** GitHub pages
+GitHub will host your static web pages for you even on a free account making it rather ideal for a blog hosting platform.
+** Pelican
+But before setting anything up in GitHub you should decide on your tooling. There are several site generators freely available with [[https://jekyllrb.com/][Jenkyll]] probably being the most popular. I initially was going to use [[https://jekyllrb.com/][Jenkyll]] but after noticing it's license I decided to look for alternatives. [[https://www.sitepoint.com/6-static-blog-generators-arent-jekyll/][Using this article]] I found Pelican which is licensed with AGPL which I feel offers more protection from open source exploitation. 
+** Git started
+With my tooling and hosting platform decided upon I followed this [[https://fedoramagazine.org/make-github-pages-blog-with-pelican/][Fedoria magazine article]] to setup the basic Git structure. I use NixOs so not every applies to me but it was very helpful. They casually mention initializing your source repository with a readme but I found out the hard way that it's better to initialize it with a python .gitignore file.
+** Dev environment
+With a place to store and track my progress setup it was time to install the tools. I started with setting up a flake that I could use to version control the software used. It's not complicated if your accustomed to flakes.
+#+begin_src nix
+  
+  {
+    description = "blog";
+    inputs =
+      {
+        nixpkgs.url = "github:nixos/nixpkgs/23.11";
+       };
+    outputs = { self, nixpkgs }:
+      let
+        system = "x86_64-linux";
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+      {
+        devShells.x86_64-linux.default = ( import ./shell.nix { inherit pkgs; });
+      };
+  }
+#+end_src
+Basically you specify your sources and where you want to use them and Nix takes care of the rest. The Nix shell was surprisingly simple after a lot of trial and error due to my inexperience using them this way.
+#+begin_src nix
+  
+  { pkgs ? import <nixpkgs> { } }:
+  pkgs.mkShell
+    {
+      packages = [
+        (pkgs.python3.withPackages (python-pkgs: [
+          python-pkgs.pelican
+          python-pkgs.ghp-import
+        ]))
+        pkgs.emacs
+        pkgs.emacsPackages.htmlize
+        pkgs.emacsPackages.nix-mode
+      ];
+    }
+#+end_src
+The emacs packages used here aren't necessary if you don't plan to use the org_reader Pelican plugin. If you want to write your blog using markdown or something else it can be safely omitted. Now to work on a blog post I only need to navigate to the source git repo in the command line and run.
+#+begin_src shell
+
+  nix develop
+  make devserver
+#+end_src
+That will process the source files and serve the sight at http://127.0.0.1:8000 while monitoring your sources for changes so you can view your blog as you work on it. Since it's a nix shell I need only exit for the tooling to be removed. And because it's in a flake it will be rebuilt identically the next time.
+** Org mode blogging with Pelican
+Out of the box Pelican doesn't support org documents as source but there are three plugins you can use.
+*** org_pandoc_reader
+It appears to be very simple to use but it sadly hasn't been maintained. Requiring a very old version of python that's no longer available in the Nix packages.
+*** org_python_reader
+Is newer but sadly one of it's dependencies pyton-orgco isn't packaged by nix yet.
+*** org_reader
+Is the most logical of the org plugins available requiring only emacs which you're probably using to author your org documents anyway. It needs to know the path to emacs which is complicated by running nix shell on NixOS.
+** Installing and configuring org_reader
+I chose to add the pelican plugins repo as a git submodule to keep everything contained and make my paths simple. It's may not be the best solution but since I already have a submodule for the output why not add more? Per the plugins documentation I only needed to tell Pelican where to find the plugins and define what to use.
+#+begin_src python
+  
+  PLUGIN_PATHS = ['./pelican-plugins']
+  PLUGINS = ['org_reader']
+#+end_src
+Telling org_reader where to find emacs in a nix shell dev environment was a bit more tricky. I settled on making the shell that installs emacs do it for me. Someday I may improve this bash with some simple if statements but it's enough to keep me moving forward. The property doesn't need to be added every time nix develop is called so once it did it's thing I commented it out leaving my shell.nix file looking like
+#+begin_src nix
+
+  { pkgs ? import <nixpkgs> { } }:
+pkgs.mkShell
+  {
+    packages = [
+      (pkgs.python3.withPackages (python-pkgs: [
+        python-pkgs.pelican
+        python-pkgs.ghp-import
+      ]))
+      pkgs.emacs
+      pkgs.emacsPackages.htmlize
+      pkgs.emacsPackages.nix-mode
+    ];
+    # shellHook = ''
+    #   echo ORG_READER_EMACS_LOCATION = \'${pkgs.emacs}/bin/emacs\' >> ./pelicanconf.py
+    # '';
+  }
+#+end_src
+* Final thoughts
+There's work still to be done with the syntax highlighting some formatting I'd like to improve but that can be tomorrows problem.
+
